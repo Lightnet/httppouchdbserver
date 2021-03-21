@@ -25,9 +25,9 @@ let password='test';
 
 var db = new PouchDB('http://127.0.0.1:5984/pouchdb', {
   //skip_setup: true,
-  //auth: { username, password },
+  auth: { username, password },
   fetch: (url, opts) => {
-    console.log('DATABASE FETCH!');
+    //console.log('DATABASE FETCH!');
     //opts.credentials = 'include';//error
     //opts.origins = 'http://127.0.0.1:3000'//not tested
     //opts.credentials = 'omit';//ok

@@ -14,174 +14,26 @@
 
 // SET UP MODULES
 const http = require("http");
-const cookie = require('cookie');
-const fs = require('fs').promises;
+//const cookie = require('cookie');
+//const fs = require('fs').promises;
 const PouchDB = require('pouchdb');
-const url = require('url');
+//const url = require('url');
 
-const express = require('express')
-const cors = require('cors')
-
+const config=require('../config');
+//console.log(config);
 
 // SET UP VARS
 const db = new PouchDB('pouchdb');
-const host = '127.0.0.1';
-const port = 3000;
-//http://localhost:3000/ // does not work on dev need real ip
-//const origns =[
-  //"http://127.0.0.1:3000",
-  //"http://127.0.0.1:5984"
-//];
-var allowlist = [
+const host = config.host || '127.0.0.1';
+const databasePort = config.databasePort || 5984;
+//const port = config.port || 3000;
+
+var allowlist = config.allowlist || [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://127.0.0.1:5984",
   "http://localhost:5984"
 ];
-
-//fs.readFile(__dirname + "/index.html")
-//.then(contents => {
-  //res.setHeader("Content-Type", "text/html");
-  //res.writeHead(200);
-  //res.end(contents);
-//}).catch(err => {
-  //res.writeHead(500);
-  //res.end(err);
-  //return;
-//});
-function textHtml(){
-  return `<!DOCTYPE>
-<html>
-  <head>
-    <!--
-    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.min.js"></script>
-    -->
-    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.js"></script>
-  </head>
-  <body>
-    <label>This is HTML</label>
-    <script src="/client.js"></script>
-  </body>
-</html>`;
-}
-//ENTRY WEB SERVER
-;(async ()=>{
-const clientjs = await fs.readFile('./client.js', 'utf8');
-
-const app = express();
-var corsOptions = {
-  origin: 'http://localhost:8080',
-  optionsSuccessStatus: 200 // For legacy browser support
-}
-corsOptions={};
-//app.options('*', cors()) // include before other routes
-//app.use(cors(corsOptions));
-
-var corsOptionsDelegate = function (req, callback) {
-  var host = req.get('host');
-  console.log('host',host);
-  var origin = req.get('origin');
-  console.log('origin',origin);
-  var corsOptions;
-  //console.log(req.header)
-  //console.log(req.url)
-  //console.log('corsOptionsDelegate:',req.header('Origin'));
-  if (allowlist.indexOf(req.header('Origin')) !== -1) {
-    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-  } else {
-    corsOptions = { origin: false } // disable CORS for this request
-  }
-  //corsOptions = { origin: true }
-  corsOptions = { 
-    origin: true,
-    credentials:true,
-    preflightContinue:true,
-    optionsSuccessStatus:204,
-    maxAge: 3600
-
-  }
-  callback(null, corsOptions) // callback expects two parameters: error and options
-}
-
-app.use(function(req, res, next) {
-  // Website you wish to allow to connect
-  //res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5984/pouchdb');
-
-  //console.log('CHECKING method');
-  // intercept OPTIONS method
-  console.log(req.method);
-  if ('OPTIONS' == req.method) {
-    res.send(200);
-  }
-  next();
-});
-
-//app.get('/', cors(corsOptionsDelegate),(req, res) => {
-app.get('/',(req, res) => {
-  res.send(textHtml())
-})
-
-//app.get('/client.js', cors(corsOptionsDelegate),(req, res) => {
-app.get('/client.js',(req, res) => {
-  res.send(clientjs)
-})
-
-app.get('/pouchdb',(req, res) => {
-  res.send({message:'ok'});
-})
-
-app.get('/hello', cors(), (req, res) => {
-  res.json({
-      message: 'Hello World'
-  });
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
-
-/*
-const requestListener = function (req, res) {
-  console.log('WEB SERVER');
-  //console.log(req.header.origin);
-  if ( req.method === 'OPTIONS' ) {
-    console.log('WEB SERVER...');
-		res.writeHead(200);
-		res.end();
-		return;
-	}
-  // res.setHeader("Content-Type", "application/json");
-  // res.setHeader("Content-Type", "text/csv");
-  // res.setHeader("Content-Type", "text/html");
-  // res.setHeader("Content-Type", "text/javascript");
-  //res.writeHead(200);
-  ////res.end("My first server!");
-  console.log('req.url:',req.url);
-  console.log('req.method:',req.method);
-  switch (req.url) {
-    case "/":
-      res.setHeader("Content-Type", "text/html");
-      res.writeHead(200);
-      let body = textHtml();
-      res.end(body);
-      break;
-    case "/client.js":
-      res.setHeader("Content-Type", "text/javascript");
-      res.writeHead(200);
-      res.end(clientjs);
-      break;
-    default:
-      res.setHeader("Content-Type", "application/json");
-      res.writeHead(404);
-      res.end(JSON.stringify({error:"Resource not found"}));
-  }
-};
-const server = http.createServer(requestListener);
-server.listen(port, host, () => {
-    console.log(`Server is running on http://${host}:${port}`);
-});
-*/
-})();
 
 //===============================================
 // BODY PARSER
@@ -235,7 +87,6 @@ async function dbPutDoc(body){
   });
 }
 
-
 // DB
 async function db_(){
   return new Promise( async (resolve, reject) => {
@@ -249,7 +100,6 @@ async function db_(){
   });
 }
 
-
 // https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
 // ENTRY DATABASE
 ;(async ()=>{
@@ -260,6 +110,7 @@ async function dbrequestListener(req, res) {
 
   //need to check url white list
   //console.log(req.headers.origin)
+  //console.log(req.headers)
   let origin;
   try{//check for fetch agent
     origin = req.headers.origin;// fetch url
@@ -268,9 +119,6 @@ async function dbrequestListener(req, res) {
     //console.log('FETCH AGENT?');
   }
   if(origin){
-    //console.log(`/////////////${origin}//////////////`);
-    //console.log('allowlist.indexOf(origin)::',allowlist.indexOf("http://127.0.0.1:3000"))
-    //console.log('allowlist.indexOf(origin)::',allowlist.indexOf(origin))
     //console.log(allowlist);
     //console.log(typeof origin)
     //console.log('origin:',origin);
@@ -296,7 +144,10 @@ async function dbrequestListener(req, res) {
   //console.log('DATABASE SERVER');
   console.log('req.url:',req.url);
   console.log('req.method:',req.method);
-
+  //if(req.method == 'OPTIONS'){
+    //console.log(req.headers);
+  //}
+  
   // Parse the cookies on the request
   //var cookies = cookie.parse(req.headers.cookie || '');
   //console.log(cookies);
@@ -399,33 +250,12 @@ async function dbrequestListener(req, res) {
     return;
   }
 
-
-
   res.statusCode=404;// Tell the client that the resource wasn't found.
   res.end(JSON.stringify({error:"Resource not found"}));
-  //switch (req.url) {
-    //case "/":
-      //res.setHeader("Content-Type", "text/html");
-      //res.writeHead(200);
-      //let body = textHtml();
-      //res.end(body);
-      //break;
-    //case "/:name":
-      //res.setHeader("Content-Type", "application/json");
-      //res.writeHead(200);
-      //console.log(req.params);
-
-      //res.end();
-      //break;
-    //default:
-      //res.setHeader("Content-Type", "application/json");
-      //res.writeHead(404);
-      //res.end(JSON.stringify({error:"Resource not found"}));
-  //}
 };
 
 const dbserver = http.createServer(dbrequestListener);
-var databasePort = 5984;
+
 dbserver.listen(databasePort, host, () => {
     console.log(`Database Server on http://${host}:${databasePort}`);
 });
