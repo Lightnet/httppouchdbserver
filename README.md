@@ -10,3 +10,8 @@
 
   Wanted to work on most basic design.
 
+# Testing:
+ There are two server for testing. One for web site and other is pouchdb server to handle database.
+
+ Pouchdb server does not much functions yet.
+

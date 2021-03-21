@@ -25,7 +25,7 @@ let password='test';
 
 var db = new PouchDB('http://127.0.0.1:5984/pouchdb', {
   //skip_setup: true,
-  auth: { username, password },
+  //auth: { username, password },
   fetch: (url, opts) => {
     console.log('DATABASE FETCH!');
     //opts.credentials = 'include';//error
@@ -37,6 +37,28 @@ var db = new PouchDB('http://127.0.0.1:5984/pouchdb', {
 db.info().then(function (info) {
   console.log(info);
 });
+
+;(async()=>{
+  try {
+    var response = await db.put({
+      _id: 'mydoc',
+      title: 'Heroes'
+    });
+    console.log(response);
+  } catch (err) {
+    console.log(err);
+  }
+
+})();
+
+
+
+
+
+
+
+
+
 
 /*
 var db = new PouchDB('http://127.0.0.1:5984/pouchdb', {

@@ -11,3 +11,12 @@
  * https://gist.github.com/cojohn/1772154
  * https://stackoverflow.com/questions/32157983/unable-to-decode-base64-from-req-header-authorization
  * https://stackoverflow.com/questions/52165333/deprecationwarning-buffer-is-deprecated-due-to-security-and-usability-issues/52165509
+ * https://dev.to/edemagbenyo/nodejs-authentication-with-http-basic-access-part-1-ii2
+ * https://www.npmjs.com/package/http-auth
+ * https://www.geeksforgeeks.org/basic-authentication-in-node-js-using-http-header/
+ * 
+ * 
+ * 
+ * 
+ * 
+
