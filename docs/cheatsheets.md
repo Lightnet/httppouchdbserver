@@ -59,3 +59,63 @@
     return;
   });
   ```
+
+  ```javascript
+/
+  ^           # matches start of line
+ [^\/]+       # matches any character other than / one or more times
+ \/statistics # matches /statistics
+ \/?          # optionally matches /
+ (?:          # non-capturing group
+   [^\/]+     # matches any character other than / one or more times
+   \/?        # optionally matches /
+ )*           # zero or more times
+ $            # matches end of line
+/
+g             # global flag - matches all
+m             # multi-line flag - ^ and $ matches start and end of lines
+
+
+
+// https://stackoverflow.com/questions/34691809/regex-match-folder-and-all-subfolders
+.*             # any length string
+/statistics    # statistics directory
+($|/.*)        # end of string or any string starting with /
+
+
+//    (?<=\/)    //ingore question mark
+  ```
+
+```javascript
+
+
+([^\/]+)\/?($) // last "/" slash
+
+
+([^\/]+)\/?([\?]) // look for the first question mark
+([^\/]+)?([\?])// look for the first question mark
+
+remove double slash from url javascript
+([^:]\/)
+
+abc.replace(/([^:]\/)\/+/g, "$1");
+
+https://stackoverflow.com/questions/22173575/how-to-replace-double-slash-with-single-slash-for-an-url/22173901
+(?<!(http:|https:))//
+
+
+(?<!\\w\+:\?)
+
+
+([^\/][-a-z_A-Z0-9]*)(\/)?\/(?:[-\w!#$]+)
+
+
+([^\/][-a-z_A-Z0-9]*)\/([-a-z_A-Z0-9]*) //not working yet
+// /datA-s3asdasd/asdasdddocs?dasd
+
+
+// https://regex101.com/r/bASg8Q/1
+/([^\/][-a-z_A-Z0-9]*)\/([^\\\?]*)/ //works // database , docs group2
+
+/database/sd/sdfsffsf?sd
+```

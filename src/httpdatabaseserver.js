@@ -28,12 +28,23 @@ const host = config.host || '127.0.0.1';
 const databasePort = config.databasePort || 5984;
 //const port = config.port || 3000;
 
+//DEV TEST
 var allowlist = config.allowlist || [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://127.0.0.1:5984",
   "http://localhost:5984"
 ];
+
+//===============================================
+//
+//===============================================
+// https://stackoverflow.com/questions/154059/how-can-i-check-for-an-empty-undefined-null-string-in-javascript?page=2&tab=votes
+function isEmptyString(s){
+  return ((typeof s === 'string' || s instanceof String) && s !== '');
+}
+//console.log(isEmptyString(''));
+//console.log(isEmptyString('test'));
 
 //===============================================
 // BODY PARSER
@@ -76,8 +87,25 @@ async function dbPutDoc(body){
     try {
       console.log(typeof body);
       console.log(body);
-      body = JSON.parse(body);
+      if(typeof body === 'string'){
+        body = JSON.parse(body);
+      }
+      
       var response = await db.put(body);
+      resolve(response);
+    } catch (err) {
+      //console.log(err);
+      //reject(err);
+      resolve(err);
+    }
+  });
+}
+
+// DB dbGetDocId
+async function dbGetDocId(id){
+  return new Promise( async (resolve, reject) => {
+    try {
+      var response = await db.get(id);
       resolve(response);
     } catch (err) {
       //console.log(err);
@@ -144,9 +172,9 @@ async function dbrequestListener(req, res) {
   //console.log('DATABASE SERVER');
   console.log('req.url:',req.url);
   console.log('req.method:',req.method);
-  //if(req.method == 'OPTIONS'){
+  if(req.method == 'OPTIONS'){
     //console.log(req.headers);
-  //}
+  }
   
   // Parse the cookies on the request
   //var cookies = cookie.parse(req.headers.cookie || '');
@@ -189,12 +217,56 @@ async function dbrequestListener(req, res) {
   //console.log(queryObject);
 
   //Need database 127.0.0.1:80/databasname/docnameid/
+  //let dbrex = /[^\/][-a-z_A-Z0-9]*/;
+  //let _database = req.url.match(dbrex)[0];
+  //console.log("DATABASE NAME:",_database);
+
+  let dbrex = /([^\/][-a-z_A-Z0-9]*)\/([^\\\?]*)/;
+  let _database = req.url.match(dbrex)[1];
+  let _docId = req.url.match(dbrex)[2];
+  console.log("DATABASE NAME:",_database);
+
+  console.log('isEmptyString database',isEmptyString(_database));
+  console.log(`isEmptyString ''`,isEmptyString(''));
+  console.log('isEmptyString docId',isEmptyString(_docId));
+
   let pathcount = req.url.split("/");
   console.log(pathcount);
-  if((pathcount.length == 3)&& (req.method == 'OPTIONS') &&(pathcount[2]=='')){
+  // check if database if found with options and doc id name is false
+  if((isEmptyString(_database) == true)&& (req.method == 'OPTIONS') && (isEmptyString(_docId)==false)){
+    //console.log('FOUND DATABASE');
+    console.log(">>>SUB METHOD: ", req.headers['access-control-request-method']);
+    res.statusCode=200;
+    let result = await dbInfo();
+    if(typeof result == 'string'){
+      res.end(result);
+    }else{
+      res.end(JSON.stringify(result));
+    }
+    return;
+  }
+  // check if database if found with get and doc id name is false
+  if((isEmptyString(_database) == true) && (req.method == 'GET')&& (isEmptyString(_docId)==false)){
     //console.log('FOUND DATABASE');
     res.statusCode=200;
     let result = await dbInfo();
+    if(typeof result == 'string'){
+      res.end(result);
+    }else{
+      res.end(JSON.stringify(result));
+    }
+    return;
+  }
+  
+  // this section deal with doc matching methods
+  // DATABASE / DOC ID > options?
+  if((isEmptyString(_database)==true) && (req.method == 'OPTIONS')&& (isEmptyString(_docId)==true) ){
+    res.setHeader("Content-Type", "application/json");
+    console.log(">>>SUB METHOD: ", req.headers['access-control-request-method']);
+    //console.log('FOUND DATABASE');
+    res.statusCode=200;
+    let result = await dbGetDocId(_docId);
+    console.log('result:',result);
     if(typeof result == 'string'){
       res.end(result);
     }else{
@@ -203,10 +275,13 @@ async function dbrequestListener(req, res) {
     return;
   }
 
-  if((pathcount.length == 3)&& (req.method == 'GET')&&(pathcount[2]=='')){
+  // DATABASE / DOC ID > get
+  if((isEmptyString(_database)==true) && (req.method == 'GET')&& (isEmptyString(_docId)==true)){
+    res.setHeader("Content-Type", "application/json");
     //console.log('FOUND DATABASE');
     res.statusCode=200;
-    let result = await dbInfo();
+    let result = await dbGetDocId(pathcount[2]);
+    console.log('result:',result);
     if(typeof result == 'string'){
       res.end(result);
     }else{
@@ -215,38 +290,33 @@ async function dbrequestListener(req, res) {
     return;
   }
   
-  if((pathcount.length == 3)&& (req.method == 'OPTIONS')&&(pathcount[2]!='')){
-    res.statusCode=200;
-    let body = await bodypraser(req);
-    //res.end(JSON.stringify({error:"Resource not found"}));
-    res.end(JSON.stringify({error:"Resource not found"}));
-    //if(typeof result == 'string'){
-      //res.end(result);
-    //}else{
-      //res.end(JSON.stringify(result));
-    //}
-    return;
-  }
-  
-  if((pathcount.length == 3)&& (req.method == 'PUT')&&(pathcount[2]!='')){
+  // DATABASE / DOC ID > put ( post )
+  if((isEmptyString(_database)==true) && (req.method == 'PUT') && (isEmptyString(_docId)==true)){
     res.setHeader("Content-Type", "application/json");
     //console.log('FOUND DATABASE');
     res.statusCode=200;
+    // TODOLIST
+    //need to fixed this incase there no post body data.
     let body = await bodypraser(req);
     //console.log(body);
     let result = await dbPutDoc(body);
     console.log('typeof result>>>>');
     console.log(typeof result);
     console.log(result);
-    //res.end(JSON.stringify({error:"Resource not found"}));
     if(typeof result == 'string'){
       res.end(result);
     }else{
-      //let textjson =JSON.stringify(result);
-      //console.log(typeof textjson);
-      //console.log(textjson);
       res.end(JSON.stringify(result));
     }
+    return;
+  }
+
+  if((isEmptyString(_database)==true) && (req.method == 'DELETE') && (isEmptyString(_docId)==true)){
+    res.setHeader("Content-Type", "application/json");
+    res.statusCode=200;
+    let body = await bodypraser(req);
+    console.log('body',body);
+    res.end(JSON.stringify({error:"Resource not found"}));
     return;
   }
 
