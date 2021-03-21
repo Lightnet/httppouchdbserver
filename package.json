@@ -1,0 +1,22 @@
+{
+  "name": "httppouchdb",
+  "version": "1.0.0",
+  "description": "pouchdb server rest api or something",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js",
+    "dev": "nodemon ./app.js localhost 3000"
+  },
+  "keywords": [
+    "pouchdb",
+    "http"
+  ],
+  "author": "Lightnet",
+  "license": "MIT",
+  "dependencies": {
+    "cookie": "^0.4.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "pouchdb": "^7.2.2"
+  }
+}
