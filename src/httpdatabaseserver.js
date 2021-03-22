@@ -9,25 +9,135 @@
 // https://www.npmjs.com/package/cors
 // https://stackoverflow.com/questions/42543514/fetch-post-issues-with-cors-not-getting-header
 // https://docs.oracle.com/cd/E65459_01/dev.1112/e65461/content/general_cors.html
+// https://stackoverflow.com/questions/10265798/determine-project-root-from-a-running-node-js-application
+// https://stackabuse.com/get-http-post-body-in-express-js/
+// https://itnext.io/how-to-handle-the-post-request-body-in-node-js-without-using-a-framework-cd2038b93190
 // 
 // 
+// 
+// 
+// 
+
 
 // SET UP MODULES
 const http = require("http");
-//const cookie = require('cookie');
-//const fs = require('fs').promises;
+const path = require('path');
+const { parse } = require('querystring');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cookie = require('cookie');
+const url = require('url');
+const fs = require('fs').promises;
 const PouchDB = require('pouchdb');
-//const url = require('url');
-
+PouchDB.plugin(require('pouchdb-find'));
+//console.log(__dirname);
+//console.log(path.resolve(__dirname, "/database/"))
+//console.log(path.join(__dirname, "../database/"))
+//console.log(path.resolve('./'));
+var currentDir = path.resolve('./');
+console.log(path.join(currentDir, "/database/"))
+var PrefixedPouchDB =PouchDB.defaults({
+  //prefix: '/database/' //drive dir
+  prefix:path.join(currentDir, "/database/")
+});
 const config=require('../config');
 //console.log(config);
 
 // SET UP VARS
-const db = new PouchDB('pouchdb');
 const host = config.host || '127.0.0.1';
 const databasePort = config.databasePort || 5984;
-//const port = config.port || 3000;
+const saltRounds = 10;
+const tokenKey='TOKEN';
 
+//const port = config.port || 3000;
+//init setup database
+const db = new PrefixedPouchDB('pouchdb');
+const nodeDb = new PrefixedPouchDB('node');
+
+//===============================================
+//
+//===============================================
+function timeStamp(){
+  return new Date().getTime();
+}
+function timeDate(num){
+  var today = new Date(num);
+  //return today;
+  //return today.toLocaleDateString("en-US");
+  return today.toLocaleString("en-US");
+}
+function initDB(){
+  //db.info().then(function (result) {
+    // handle result
+    //console.log(result);
+  //}).catch(function (err) {
+    //console.log(err);
+  //});
+  db.createIndex({
+    index: {
+      fields: ['alias']
+    }
+  }).then(function (result) {
+    // handle result
+    //console.log(result);
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+
+async function loginDB(args){
+  if(!args){
+    return null;
+  }
+  return new Promise( async (resolve, reject) => {
+    try {
+      var response = await db.get(args.alias);
+      resolve(response);
+    } catch (err) {
+      //console.log(err);
+      resolve(err);
+    }
+  });
+}
+
+async function tokenLoginDB(args){
+
+}
+
+async function signUpDB(args){
+  if(!args){
+    return null;
+  }
+  return new Promise( async (resolve, reject) => {
+    try {
+      //let passphrase = args.passphrase;
+      const passphrase = bcrypt.hashSync(args.passphrase, saltRounds);
+      var response = await db.put({
+        _id:args.alias
+        ,aliasid:''
+        ,alias:args.alias
+        ,passphrase:passphrase
+        ,date:timeStamp()
+        ,token:''
+        ,role:'user'
+        ,tokenkey:''
+        ,question1:''
+        ,question2:''
+        ,hint:''
+      });
+      resolve(response);
+    } catch (err) {
+      //console.log(err);
+      resolve(err);
+    }
+  });
+}
+// 
+async function forgotDB(args){
+  
+}
+
+initDB();
 //DEV TEST
 //check sites third party site access
 var allowlist = config.allowlist || [
@@ -40,9 +150,8 @@ var allowlist = config.allowlist || [
 var databaselist= config.databaselist || [
   'pouchdb'
 ];
-
 //===============================================
-//
+// isEmptyString
 //===============================================
 // https://stackoverflow.com/questions/154059/how-can-i-check-for-an-empty-undefined-null-string-in-javascript?page=2&tab=votes
 function isEmptyString(s){
@@ -50,7 +159,6 @@ function isEmptyString(s){
 }
 //console.log(isEmptyString(''));
 //console.log(isEmptyString('test'));
-
 //===============================================
 // BODY PARSER
 async function bodypraser(req){
@@ -64,6 +172,8 @@ async function bodypraser(req){
       //console.log(chunk);
       body.push(chunk);
     }).on('end', () => {
+      //console.log('body >>>>>>>>>>');
+      //console.log(body);
       body = Buffer.concat(body).toString();
       //console.log('body:',body);
       resolve(body);
@@ -81,11 +191,22 @@ async function dbInfo(){
       resolve(result);
     } catch (err) {
       //console.log(err);
-      reject(err);
+      resolve(err);
     }
   });
 }
-
+async function destroyDb(){
+  return new Promise( async (resolve, reject) => {
+    db.destroy().then(function (response) {
+      // success
+      console.log('DELETE?')
+      resolve(response);
+    }).catch(function (err) {
+      //console.log(err);
+      resolve(err);
+    });
+  });
+}
 // DB dbPutDoc
 async function dbPutDoc(body){
   return new Promise( async (resolve, reject) => {
@@ -105,21 +226,19 @@ async function dbPutDoc(body){
     }
   });
 }
-
 // DB dbGetDocId
 async function dbGetDocId(id){
   return new Promise( async (resolve, reject) => {
     try {
       var response = await db.get(id);
-      resolve(response);
+      return resolve(response);
     } catch (err) {
       //console.log(err);
       //reject(err);
-      resolve(err);
+      return reject(err);
     }
   });
 }
-
 // DB
 async function dbDelDocId(id){
   return new Promise( async (resolve, reject) => {
@@ -133,31 +252,47 @@ async function dbDelDocId(id){
     }
   });
 }
-
-// DB
-async function db_(){
-  return new Promise( async (resolve, reject) => {
-    try {
-      //var result = await db.info();
-      //resolve(result);
-    } catch (err) {
-      //console.log(err);
-      resolve(err);
-    }
-  });
+// HTML PAGE
+function htmlIndex(args){
+  var body=``;
+  args = args || {};
+  args.default || false;
+body+=`
+<!DOCTYPE>
+<html>
+  <head>
+    <!--
+    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.min.js"></script>
+    -->
+    <script src="https://redom.js.org/redom.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.find.js"></script>
+  </head>
+  <body>
+`;
+if(args.default){
+  body+=`<script src="/client.js"></script>`;
+}else{
+  body+=`<script src="/clientaccess.js"></script>`;
 }
-
+body+=`</body>
+</html>`;
+  return body;
+}
+// ERROR MESSAGE
 function resourceNotfound(res){
   res.statusCode=404;// Tell the client that the resource wasn't found.
   res.end(JSON.stringify({error:"Resource not found"}));
 }
-
 // https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
 // ENTRY DATABASE
 ;(async ()=>{
+  const clientjs = await fs.readFile('./client.js', 'utf8');
+  const clientaccessjs = await fs.readFile('./clientaccess.js', 'utf8');
+
 async function dbrequestListener(req, res) {
   console.log('DATABASE SERVER CHECKING....');
-  //console.log(req);
+  //console.log(req.headers);
   console.log('req.url:',req.url);
   console.log('req.method:',req.method);
   //console.log(req.headers);
@@ -166,6 +301,18 @@ async function dbrequestListener(req, res) {
     console.log('FAVICON!');
     res.statusCode=204;
     res.end();
+    return;
+  }
+  if(req.url=='/client.js'){
+    res.setHeader("Content-Type", "text/javascript");
+    res.statusCode=200;
+    res.end(clientjs);
+    return;
+  }
+  if(req.url=='/clientaccess.js'){
+    res.setHeader("Content-Type", "text/javascript");
+    res.statusCode=200;
+    res.end(clientaccessjs);
     return;
   }
   //need to check url white list
@@ -192,6 +339,35 @@ async function dbrequestListener(req, res) {
   }else{
     //res.setHeader("Access-Control-Allow-Origin",  "*");
   }
+  // Parse the query string
+  var query = parse(req.url);
+  //console.log('query ////////');
+  //console.log(query);
+  //set cookie header name
+  //console.log(req.headers);
+  if (query && query.token) {
+    console.log('QUERY TOKEN ///////////////////////////');
+    // Set a new cookie with the name
+    //res.setHeader('Set-Cookie', cookie.serialize('token', String(query.token), {
+      //httpOnly: true,
+      //maxAge: 60 * 60 * 24 * 7 // 1 week
+    //}));
+ 
+    // Redirect back after setting cookie
+    //res.statusCode = 302;
+    //res.setHeader('Location', req.headers.referer || '/');
+    //res.end();
+    //return;
+  }
+  // Parse the cookies on the request
+  var cookies = cookie.parse(req.headers.cookie || '');
+  //console.log('cookies:',cookies);
+
+  // Get the visitor name set in the cookie
+  var token = cookies.token;
+  console.log("TOKEN:",token);
+
+  //test for cors
   if(req.url=='/fetch'){
     console.log('fetch!');
     res.writeHead(200);
@@ -199,12 +375,135 @@ async function dbrequestListener(req, res) {
     return;
   }
   // INDEX MAIN ENTRY PAGE SITE
-  if(req.url=='/'){
+  if((req.url=='/') && (req.method=='GET')){
     console.log('MAIN DATABASE SITE!');
+    res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
-    res.end("PouchDB Server!");
+    //res.end("PouchDB Server!");
+    let isvalid=false;
+    if(token){
+      isvalid=true;
+    }
+    res.end(htmlIndex({default:isvalid}));
     return;
   }
+
+  if((req.url=='/') && (req.method == 'POST')){
+    //res.setHeader("Content-Type", "application/json");
+    //res.writeHead(200);
+    let body = await bodypraser(req);
+    console.log(typeof body)
+    console.log(body);
+    if(body.length == 0){
+      res.end(`{"error":"fail"}`);
+      return;
+    }
+    if(typeof body == 'string'){ // alias=alias&passphrase=aliaspass&action=login
+      console.log(parse(body));
+      let post = parse(body);
+      if(post){
+        if(post.action){
+          console.log("ACTION:",post.action)
+          if(post.action == 'login'){
+            
+            if(isEmptyString(post.alias)==false){
+              return res.end(`{"error":"empty field fail login!"}`);
+            }
+
+            let result = await loginDB({
+              alias:post.alias,
+              passphrase:post.passphrase,
+            });
+            console.log(result);
+            //console.log(result.reason);
+            if(result.reason == 'missing'){
+              return res.end(`{"error":"alias doesn't exist!"}`);  
+            }
+            //make sure it match
+            let isPass=false;
+            isPass=bcrypt.compareSync(post.passphrase, result.passphrase); // true
+            console.log('isPass:',isPass);
+            if((result.alias == post.alias)&&(isPass==true)){
+              var token = jwt.sign({
+                alias: result.alias
+                , role: result.role
+                , read: true
+                , write: true
+                , aliasId:''
+              }, tokenKey, {
+                expiresIn: '1h'
+                //,algorithm: 'RS256'
+              });
+
+              // Set a new cookie with the name
+              res.setHeader('Set-Cookie', cookie.serialize('token', String(token), {
+                httpOnly: true,
+                maxAge: 60 * 60 * 24 * 7 // 1 week
+              }));
+              // Redirect back after setting cookie
+              res.statusCode = 302;
+              res.setHeader('Location', req.headers.referer || '/');
+              return res.end();
+              //return res.end(`{"message":"pass"}`);
+            }else{
+              return res.end(`{"error":"login fail!"}`);
+            }
+            return res.end(`{"message":"pass"}`);
+          }else if(post.action == 'register'){
+            //console.log(isEmptyString(post.passphrase1));
+            if((isEmptyString(post.passphrase1)==true) && (isEmptyString(post.passphrase2)==true) && (isEmptyString(post.salias)==true) && (post.passphrase1 == post.passphrase2)){
+              console.log('PASS')
+            }else{
+              console.log('FAIL');
+              return res.end(`{"error":"register fail either incorrect password || empty field"}`);
+            }
+            let result = await signUpDB({
+              alias:post.salias,
+              passphrase:post.passphrase1,
+            });
+            console.log(result);
+            if(result.error){
+              return res.end(`{"message":"exist"}`);
+            }
+            if(result.ok){
+              return res.end(`{"message":"pass"}`);
+            }
+          }else if(post.action == 'forgot'){
+            //TODOLIST
+
+
+            return res.end(`{"message":"pass"}`);
+          }else{
+            return res.end(`{"error":"fail"}`);  
+          }
+          //return res.end(`{"message":"pass"}`);
+        }else{
+          return res.end(`{"error":"fail"}`);
+        }
+      }else{
+        return res.end(`{"error":"fail"}`);
+      }
+    }
+    //res.end("PouchDB Server!");
+    //json for fetch
+    return res.end(`{"message":"ok"}`);
+  }
+
+  if(req.url=='/logout'){
+    // Set a new cookie with the name
+    res.setHeader('Set-Cookie', cookie.serialize('token', String(''), {
+      httpOnly: true,
+      maxAge: 1 //
+    }));
+
+    // Redirect back after setting cookie
+    res.statusCode = 302;
+    res.setHeader('Location', '/');
+    return res.end();
+    //return res.setHeader('Location', req.headers.referer || '/');
+    //return res.end(`{"message":"logout"}`);
+  }
+
   console.log("GOIING PASS???");
   // pouchdb need authorization for user login
   res.setHeader('Access-Control-Allow-Headers', 'Origin, authorization, X-Requested-With, Content-Type, Accept, Options');
@@ -260,9 +559,9 @@ async function dbrequestListener(req, res) {
   }
 
   if(databaselist.indexOf(_database) !== -1){
-    console.log('FOUND DATABASE');
+    //console.log('FOUND DATABASE');
   }else{
-    console.log('NOT DATABASE');
+    //console.log('NOT DATABASE');
     resourceNotfound(res);
     return;
   }
@@ -302,6 +601,21 @@ async function dbrequestListener(req, res) {
     }
     return;
   }
+
+  // check if database if found with delete and doc id name is false
+  if((isEmptyString(_database) == true) && (req.method == 'DELETE')&& (isEmptyString(_docId)==false)){
+    //console.log('FOUND DATABASE');
+    //TODOLIST
+    //need to fixed and prevent delete access
+    res.statusCode=200;
+    let result = await destroyDb();
+    if(typeof result == 'string'){
+      res.end(result);
+    }else{
+      res.end(JSON.stringify(result));
+    }
+    return;
+  }
   
   // this section deal with doc matching methods
   // DATABASE / DOC ID > OPTIONS
@@ -313,12 +627,18 @@ async function dbrequestListener(req, res) {
     //console.log('FOUND DATABASE');
     res.statusCode=200;
     if(req.headers['access-control-request-method'] == 'GET'){
-      let result = await dbGetDocId(_docId);
-      console.log('result:',result);
-      if(typeof result == 'string'){
-        res.end(result);
-      }else{
-        res.end(JSON.stringify(result));
+      try{
+        let result = await dbGetDocId(_docId);
+        console.log('result:',result);
+        if(typeof result == 'string'){
+          res.end(result);
+        }else{
+          res.end(JSON.stringify(result));
+        }
+      }catch(e){
+        console.log(e);
+        res.end(JSON.stringify({error:'database error!'}));
+        //res.end(JSON.stringify(e));
       }
       return;
     }else if(req.headers['access-control-request-method'] == 'DELETE'){
@@ -347,12 +667,22 @@ async function dbrequestListener(req, res) {
     res.setHeader("Content-Type", "application/json");
     //console.log('FOUND DATABASE');
     res.statusCode=200;
-    let result = await dbGetDocId(_docId);
-    console.log('result:',result);
-    if(typeof result == 'string'){
-      res.end(result);
-    }else{
-      res.end(JSON.stringify(result));
+    try{
+    //(async function () {
+      let result = await dbGetDocId(_docId);
+      console.log(typeof result);
+      console.log('result:',result);
+      console.log('result:',result.Error);
+      if(typeof result == 'string'){
+        res.end(result);
+      }else{
+        res.end(JSON.stringify(result));
+      }
+    //})().catch( e => { console.error(e);console.log("ERKERE") })
+    }catch(e){
+      console.log(e);
+      res.end(JSON.stringify({error:"database error!"}));
+      //res.end(JSON.stringify(e));
     }
     return;
   }
@@ -372,12 +702,14 @@ async function dbrequestListener(req, res) {
       return;
     }
     let result = await dbPutDoc(body);
-    console.log('[PUT] typeof result:');
-    console.log(typeof result);
-    console.log(result);
+    //console.log('[PUT] typeof result:');
+    //console.log(typeof result);
+    //console.log(result);
     if(typeof result == 'string'){
       res.end(result);
-    }else{
+    }/*else if(typeof result == 'object'){
+      res.end(JSON.stringify({error:'database is destroyed'}));  
+    }*/else{
       res.end(JSON.stringify(result));
     }
     return;
@@ -401,6 +733,36 @@ async function dbrequestListener(req, res) {
 };
 
 const dbserver = http.createServer(dbrequestListener);
+
+process.stdin.resume();//so the program will not close instantly
+
+async function exitHandler(options, exitCode) {
+  dbserver.close();
+  await db.close();
+  if (options.cleanup){ 
+    console.log('clean');
+  }
+  if (exitCode || exitCode === 0) {
+    console.log('exitCode:',exitCode);
+  }
+  if (options.exit) {
+    console.log('EXIT');
+    process.exit();
+  }
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
 dbserver.listen(databasePort, host, () => {
     console.log(`Database Server on http://${host}:${databasePort}`);

@@ -17,9 +17,29 @@ require('./src/expressserver');
 // DATABASE
 require('./src/httpdatabaseserver');
 
-const url = require('url');
+// https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString
+//console.log(new Date().getTime());
 
-let mypath = '/datsdfabas/mydocs/test/test?';
+function timeStamp(){
+  return new Date().getTime();
+}
+console.log(timeStamp());
+function timeDate(num){
+  var today = new Date(num);
+  //return today;
+  //return today.toLocaleDateString("en-US");
+  return today.toLocaleString("en-US");
+}
+let timenum = timeStamp();
+//console.log(new Date(1616436221506));
+console.log(timeDate(1616436221506));
+console.log(timeDate(timenum));
+
+
+//const url = require('url');
+
+//let mypath = '/datsdfabas/mydocs/test/test?';
 
 //const myURL = new URL(mypath);
 //console.log(myURL);

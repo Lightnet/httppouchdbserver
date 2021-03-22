@@ -15,9 +15,13 @@
   "author": "Lightnet",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cookie": "^0.4.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "pouchdb": "^7.2.2"
+    "jsonwebtoken": "^8.5.1",
+    "pouchdb": "^7.2.2",
+    "pouchdb-find": "^7.2.2",
+    "querystring": "^0.2.1"
   }
 }

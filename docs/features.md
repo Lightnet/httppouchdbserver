@@ -2,12 +2,12 @@
   Work in progress. Note to test my skills to get the simple database working with pouchdb server from browswer.
 
 PouchDB
- * Put
- * Update
- * Delete
- * Find All Docs
- * add ons, plugin, middleware, and other things.
- * 
+ * Put [ Done ]
+ * Update [Done need work later]
+ * Delete [ done ]
+ * Find All Docs [ ]
+ * add ons, plugin, middleware, and other things. [ ]
+ * Delete Database error need later fixed. try catch error message can't be sent to browser client.
 
 # Access
   Not sure to be working on the account system. Need to look into how pouchdb API or couchDB.

@@ -14,7 +14,7 @@
  * https://dev.to/edemagbenyo/nodejs-authentication-with-http-basic-access-part-1-ii2
  * https://www.npmjs.com/package/http-auth
  * https://www.geeksforgeeks.org/basic-authentication-in-node-js-using-http-header/
- * 
+ * https://jonasjancarik.medium.com/handling-those-unhandled-promise-rejections-when-using-javascript-async-await-and-ifee-5bac52a0b29f
  * 
  * 
  * 

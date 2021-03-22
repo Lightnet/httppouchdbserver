@@ -70,6 +70,16 @@ function getDbInfo(){
     setResult(info);
   });
 }
+
+function destroyDb(){
+  db.destroy().then(function (response) {
+    // success
+    setResult(response);
+  }).catch(function (err) {
+    console.log(err);
+    setResult(err);
+  });
+}
 //===============================================
 async function getDocIdInfo(){
   try {
@@ -109,7 +119,6 @@ async function putDocJson(){
     setResult(err);
   }
 }
-
 async function delDocJson(){
   try {
     var doc = await db.get(getDocId());
@@ -121,7 +130,6 @@ async function delDocJson(){
     setResult(err);
   }
 }
-
 function fetechTest(){
   fetch('http://127.0.0.1:5984/fetch',{
     //mode:'no-cors'
@@ -150,7 +158,6 @@ function fetechPostTest(){
     console.error(err);
   });
 }
-
 function IsJsonString(str) {
   try {
       JSON.parse(str);
@@ -199,6 +206,7 @@ var textAreaResultContent=el('textarea',{id:'docResult',placeholder:'Results',
 });
 var divButtonMenus=el('div',[
   el('label',{textContent:'Actions:'})
+  ,el('button',{onclick:destroyDb ,textContent:'DB Destory'})
   ,el('button',{onclick:getDbInfo ,textContent:'DB Info'})
   ,el('button',{onclick:getDocIdInfo ,textContent:'get DocId'})
   ,el('button',{onclick:putDocJson ,textContent:'Put Json'})
@@ -213,7 +221,8 @@ var divButtonMenus=el('div',[
 //===============================================
 //
 var divDbPanel=el('div',[
-  //inputDocId,
+  el('a',{href:'/logout',textContent:'Logout'}),
+  el('span',{textContent:' - | - '}),
   labelDocId,
   labelJsonValid,
   el('br'),

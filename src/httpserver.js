@@ -18,6 +18,7 @@ function textHtml(){
     -->
     <script src="https://redom.js.org/redom.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.2.1/dist/pouchdb.find.js"></script>
   </head>
   <body>
     <label>This is HTML</label>
