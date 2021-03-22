@@ -59,10 +59,15 @@ function setResult(data){
   //return document.getElementById('docResult').value=JSON.stringify(data);
   return document.getElementById('docResult').value=JSON.stringify(data, null, 2);
 }
+function clearResult(){
+  //return document.getElementById('docResult').value=JSON.stringify(data);
+  return document.getElementById('docResult').value='';
+}
 //===============================================
 function getDbInfo(){
   db.info().then(function (info) {
     console.log(info);
+    setResult(info);
   });
 }
 //===============================================
@@ -73,21 +78,15 @@ async function getDocIdInfo(){
     }
     var doc = await db.get(getDocId());
     console.log(doc);
-
-    document.getElementById('docResult').value=JSON.stringify(doc, null, 2);
+    //document.getElementById('docResult').value=JSON.stringify(doc, null, 2);
+    setResult(doc);
   } catch (err) {
     console.log(err);
+    setResult(err);
   }
 }
 //===============================================
 async function putDocJson(){
-  //let content = getDocContent();
-  //console.log(typeof content)
-  //console.log(JSON.stringify(content));
-  //content = JSON.stringify(content)
-  //content = JSON.parse(content);
-  //console.log(content );
-
   try {
     if(isEmptyString(getDocContent())==false){
       return console.log('EMPTY!');
@@ -111,121 +110,121 @@ async function putDocJson(){
   }
 }
 
+async function delDocJson(){
+  try {
+    var doc = await db.get(getDocId());
+    var response = await db.remove(doc);
+
+    setResult(response);
+  } catch (err) {
+    console.log(err);
+    setResult(err);
+  }
+}
+
+function fetechTest(){
+  fetch('http://127.0.0.1:5984/fetch',{
+    //mode:'no-cors'
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('PASS....');
+    console.log(data);
+  })
+  .catch(err =>{
+    console.error(err);
+  });
+}
 
 //===============================================
 //
 var inputDocId=el('input',{id:'docId',placeholder:'doc ID',value:'mydoc'
   //style:{float:'left'}
 });
+var labelDocId=el('label',{textContent:'Doc ID:'},inputDocId);
+
 var textAreaDocContent=el('textarea',{id:'docContent',placeholder:'doc content', value:`{
   "_id": "mydoc",
   "title": "Heroes"
 }`,
   style:{
     //float:'left'
-    width:'178px',
-    height:'72px'
+    width:'500px',
+    height:'200px'
   }
 });
 var textAreaResultContent=el('textarea',{id:'docResult',placeholder:'Results',
   style:{
     //float:'left'
-    width:'338px',
-    height:'128px'
+    width:'500px',
+    height:'200px'
   }
 });
 var divButtonMenus=el('div',[
   el('label',{textContent:'Actions:'})
   ,el('button',{onclick:getDbInfo ,textContent:'DB Info'})
-
   ,el('button',{onclick:getDocIdInfo ,textContent:'get DocId'})
-  ,el('button',{onclick:putDocJson ,textContent:'Put'})
+  ,el('button',{onclick:putDocJson ,textContent:'Put Json'})
+  ,el('button',{onclick:delDocJson ,textContent:'Delete DocId'})
   //,el('button',{onclick:getDbInfo ,textContent:'Get'})
   //,el('button',{onclick:getDbInfo ,textContent:'Update'})
-  
-  //,el('button',{onclick:getDbInfo ,textContent:'Delete'})
   //,el('button',{onclick:getDbInfo ,textContent:'Find'})
-  
+  ,el('button',{onclick:clearResult ,textContent:'Clear Result'})
+  ,el('button',{onclick:fetechTest ,textContent:'Fetch Test'})
 ])
 //===============================================
 //
 var divDbPanel=el('div',[
-  inputDocId,
+  //inputDocId,
+  labelDocId,
   el('br'),
   textAreaDocContent,
   el('br'),
   divButtonMenus,
-  el('br'),
+  //el('br'),
   textAreaResultContent
 ]);
 mount(document.body, divDbPanel);
 //===============================================
 //
 ;(async()=>{
-  /*
-  try {
-    var response = await db.put({
-      _id: 'mydoc',
-      title: 'Heroes'
-    });
-    console.log(response);
-  } catch (err) {
-    console.log(err);
-  }
-  */
-  /*
-  try {
-    var doc = await db.get('mydoc');
-  } catch (err) {
-    console.log(err);
-  }
-  */
 
-  /*
-  try {
-    var doc = await db.get('mydoc');
-    var response = await db.remove(doc);
-  } catch (err) {
-    console.log(err);
-  }
-  */
+  //try {
+    //var response = await db.put({
+      //_id: 'mydoc',
+      //title: 'Heroes'
+    //});
+    //console.log(response);
+  //} catch (err) {
+    //console.log(err);
+  //}
+  
+  //try {
+    //var doc = await db.get('mydoc');
+  //} catch (err) {
+    //console.log(err);
+  //}
 
+  //try {
+    //var doc = await db.get('mydoc');
+    //var response = await db.remove(doc);
+  //} catch (err) {
+    //console.log(err);
+  //}
 })();
 
-
-
-
-
-
-
-
-
-
-/*
-var db = new PouchDB('http://127.0.0.1:5984/pouchdb', {
-  skip_setup: true,
+//var db = new PouchDB('http://127.0.0.1:5984/pouchdb', {
+  //skip_setup: true,
   //auth: { username, password },
-  fetch: (url, opts) => {
-    console.log('DATABASE FETCH!');
+  //fetch: (url, opts) => {
+    //console.log('DATABASE FETCH!');
     //console.log(opts);
     //opts.credentials = 'include';//errror
-    opts.credentials = 'omit';//ok
+    //opts.credentials = 'omit';//ok
     //opts.headers.set('X-Some-Special-Header', 'foo');
     //opts.headers.set('Access-Control-Allow-Origin', 'http://127.0.0.1:3000');
     //console.log(opts.headers);
-    return PouchDB.fetch(url, opts);
-  },
-});
-db.info().then(function (info) {
-  console.log(info);
-});
-*/
-/*
-fetch('http://127.0.0.1:5984/')
-  .then(response => response.json())
-  .then(data => {
-    console.log('PASS....');
-    console.log(data);
-  })
-  .catch(err => console.error(err));
-  */
+    //return PouchDB.fetch(url, opts);
+  //},
+//});
+

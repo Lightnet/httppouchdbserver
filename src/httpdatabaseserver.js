@@ -121,14 +121,28 @@ async function dbGetDocId(id){
 }
 
 // DB
+async function dbDelDocId(id){
+  return new Promise( async (resolve, reject) => {
+    try {
+      var doc = await db.get(id);
+      var response = await db.remove(doc);
+      resolve(response);
+    } catch (err) {
+      //console.log(err);
+      resolve(err);
+    }
+  });
+}
+
+// DB
 async function db_(){
   return new Promise( async (resolve, reject) => {
     try {
-      var result = await db.info();
-      resolve(result);
+      //var result = await db.info();
+      //resolve(result);
     } catch (err) {
       //console.log(err);
-      reject(err);
+      resolve(err);
     }
   });
 }
@@ -143,6 +157,7 @@ function resourceNotfound(res){
 ;(async ()=>{
 async function dbrequestListener(req, res) {
   console.log('DATABASE SERVER CHECKING....');
+  //console.log(req);
   console.log('req.url:',req.url);
   console.log('req.method:',req.method);
   //console.log(req.headers);
@@ -153,15 +168,6 @@ async function dbrequestListener(req, res) {
     res.end();
     return;
   }
-  //console.log(req);
-  // INDEX MAIN ENTRY PAGE SITE
-  if(req.url=='/'){
-    console.log('MAIN DATABASE SITE!');
-    res.writeHead(200);
-    res.end("PouchDB Server!");
-    return;
-  }
-  console.log("GOIING PASS???");
   //need to check url white list
   //console.log(req.headers.origin)
   let origin;
@@ -186,6 +192,20 @@ async function dbrequestListener(req, res) {
   }else{
     //res.setHeader("Access-Control-Allow-Origin",  "*");
   }
+  if(req.url=='/fetch'){
+    console.log('fetch!');
+    res.writeHead(200);
+    res.end(JSON.stringify({message:"ok"}));
+    return;
+  }
+  // INDEX MAIN ENTRY PAGE SITE
+  if(req.url=='/'){
+    console.log('MAIN DATABASE SITE!');
+    res.writeHead(200);
+    res.end("PouchDB Server!");
+    return;
+  }
+  console.log("GOIING PASS???");
   // pouchdb need authorization for user login
   res.setHeader('Access-Control-Allow-Headers', 'Origin, authorization, X-Requested-With, Content-Type, Accept, Options');
   // pouchdb need Methods
@@ -252,6 +272,11 @@ async function dbrequestListener(req, res) {
   //console.log(`isEmptyString ''`,isEmptyString(''));
   //console.log('isEmptyString docId',isEmptyString(_docId));
 
+  //TODOLIST
+  // 
+  // this is delete query
+  // database/docid?rev=xx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
   // check if database if found with options and doc id name is false
   if((isEmptyString(_database) == true)&& (req.method == 'OPTIONS') && (isEmptyString(_docId)==false)){
     //console.log('FOUND DATABASE');
@@ -280,20 +305,41 @@ async function dbrequestListener(req, res) {
   
   // this section deal with doc matching methods
   // DATABASE / DOC ID > OPTIONS
-  // SUB METHOD CHECKS > DELETE | GET 
+  // SUB METHOD CHECKS > DELETE | GET
+  // Need to fixed this later. query order.
   if((isEmptyString(_database)==true) && (req.method == 'OPTIONS')&& (isEmptyString(_docId)==true) ){
     res.setHeader("Content-Type", "application/json");
     console.log(">>>SUB METHOD: ", req.headers['access-control-request-method']);
     //console.log('FOUND DATABASE');
     res.statusCode=200;
-    let result = await dbGetDocId(_docId);
-    console.log('result:',result);
-    if(typeof result == 'string'){
-      res.end(result);
+    if(req.headers['access-control-request-method'] == 'GET'){
+      let result = await dbGetDocId(_docId);
+      console.log('result:',result);
+      if(typeof result == 'string'){
+        res.end(result);
+      }else{
+        res.end(JSON.stringify(result));
+      }
+      return;
+    }else if(req.headers['access-control-request-method'] == 'DELETE'){
+      let result = await dbGetDocId(_docId);// need to get and not dbDelDocId need for brower client to display log
+      if(typeof result == 'string'){
+        res.end(result);
+      }else{
+        res.end(JSON.stringify(result));
+      }
+      //console.log('????????????????????????');
+      return;
     }else{
-      res.end(JSON.stringify(result));
+      let result = await dbGetDocId(_docId);
+      console.log('result:',result);
+      if(typeof result == 'string'){
+        res.end(result);
+      }else{
+        res.end(JSON.stringify(result));
+      }
+      return;
     }
-    return;
   }
 
   // DATABASE / DOC ID > GET
@@ -321,9 +367,9 @@ async function dbrequestListener(req, res) {
     let body = await bodypraser(req);
     //console.log(body);
     let result = await dbPutDoc(body);
-    console.log('typeof result>>>>');
-    console.log(typeof result);
-    console.log(result);
+    //console.log('typeof result>>>>');
+    //console.log(typeof result);
+    //console.log(result);
     if(typeof result == 'string'){
       res.end(result);
     }else{
@@ -336,9 +382,12 @@ async function dbrequestListener(req, res) {
   if((isEmptyString(_database)==true) && (req.method == 'DELETE') && (isEmptyString(_docId)==true)){
     res.setHeader("Content-Type", "application/json");
     res.statusCode=200;
-    let body = await bodypraser(req);
-    console.log('body',body);
-    res.end(JSON.stringify({error:"Resource not found"}));
+    let result = await dbDelDocId(_docId);
+    if(typeof result == 'string'){
+      res.end(result);
+    }else{
+      res.end(JSON.stringify(result));
+    }
     return;
   }
   //TODOLIST
