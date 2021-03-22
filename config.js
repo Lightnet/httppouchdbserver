@@ -8,4 +8,7 @@ module.exports={
   "http://localhost:5984"
   ],
   databasePort:5984,
+  databaselist:[
+    'pouchdb'
+  ]
 }

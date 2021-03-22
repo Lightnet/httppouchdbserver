@@ -72,7 +72,7 @@ function textHtml(){
     //res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5984');
     //console.log('CHECKING method');
     // intercept OPTIONS method
-    console.log(req.method);
+    //console.log('req.method:',req.method);
     if ('OPTIONS' == req.method) {
       res.send(200);
     }
@@ -89,9 +89,9 @@ function textHtml(){
     res.send(clientjs)
   })
 
-  //app.get('/pouchdb',(req, res) => {
-    //res.send({message:'ok'});
-  //})
+  app.get('/pouchdb',(req, res) => {
+    res.send({message:'ok'});
+  })
 
   app.get('/hello', cors(), (req, res) => {
     res.json({
