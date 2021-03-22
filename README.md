@@ -15,6 +15,12 @@
   Wanted to work on most basic design.
 
 # Testing:
- There are two server for testing. One for web site and other is pouchdb server to handle database.
+ There are two server for testing. One for web site and other is pouchdb server to handle database. To get pouchdb browser client to connect to nodejs server.
 
- Pouchdb server does not much functions yet.
+```
+Express Server on http://127.0.0.1:3000
+Database Server on http://127.0.0.1:5984
+```
+Expressjs server is for testing simple page for getting the local pouchdb broswer to connected to rest api database using http fetch function.There is nodejs http server for web testing as well. The reason simple is to test cors, rest API and other things.
+
+The Database server as in PouchDB http rest api. Note the coding may be diferent depend on the code layout. Reason is how database is access.

@@ -46,8 +46,8 @@ const config=require('../config');
 // SET UP VARS
 const host = config.host || '127.0.0.1';
 const databasePort = config.databasePort || 5984;
-const saltRounds = 10;
-const tokenKey='TOKEN';
+const saltRounds = config.saltRounds || 10;
+const tokenKey=  config.tokenKey || 'TOKEN';
 
 //const port = config.port || 3000;
 //init setup database

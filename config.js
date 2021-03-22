@@ -1,6 +1,8 @@
 module.exports={
   host:'127.0.0.1',
   port:3000,
+  saltRounds:10,
+  tokenKey:'TOKEN',
   allowlist:[
   "http://localhost:3000",
   "http://127.0.0.1:3000",
