@@ -15,7 +15,7 @@
   Wanted to work on most basic design.
 
 # Testing:
- There are two server for testing. One for web site and other is pouchdb server to handle database. To get pouchdb browser client to connect to nodejs server.
+ There are two server for testing. One for web site and other is pouchdb server to handle http fetch rest api database. To get pouchdb browser client to connect to nodejs server.
 
 ```
 Express Server on http://127.0.0.1:3000
