@@ -365,11 +365,16 @@ async function dbrequestListener(req, res) {
     // TODOLIST
     //need to fixed this incase there no post body data.
     let body = await bodypraser(req);
-    //console.log(body);
+    console.log(body);
+    console.log("body.length:", body.length)
+    if(body.length==0){
+      res.end(JSON.stringify({error:"Empty json"}));
+      return;
+    }
     let result = await dbPutDoc(body);
-    //console.log('typeof result>>>>');
-    //console.log(typeof result);
-    //console.log(result);
+    console.log('[PUT] typeof result:');
+    console.log(typeof result);
+    console.log(result);
     if(typeof result == 'string'){
       res.end(result);
     }else{

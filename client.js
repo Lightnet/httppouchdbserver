@@ -135,7 +135,42 @@ function fetechTest(){
     console.error(err);
   });
 }
+// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+function fetechPostTest(){
+  fetch('http://127.0.0.1:5984/pouchdb/test',{
+    method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+    //mode:'no-cors'
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('PASS....');
+    console.log(data);
+  })
+  .catch(err =>{
+    console.error(err);
+  });
+}
 
+function IsJsonString(str) {
+  try {
+      JSON.parse(str);
+  } catch (e) {
+      console.log(e);
+      return false;
+  }
+  return true;
+}
+function checkDocJsonTyping(event){
+  console.log("typing...");
+  let doccontent = document.getElementById('docContent').value;
+  let isJson = IsJsonString(doccontent);
+  console.log(isJson);
+  if(isJson){
+    document.getElementById('isJson').textContent='Pass';
+  }else{
+    document.getElementById('isJson').innerHTML='Fail';
+  }
+}
 //===============================================
 //
 var inputDocId=el('input',{id:'docId',placeholder:'doc ID',value:'mydoc'
@@ -143,7 +178,9 @@ var inputDocId=el('input',{id:'docId',placeholder:'doc ID',value:'mydoc'
 });
 var labelDocId=el('label',{textContent:'Doc ID:'},inputDocId);
 
-var textAreaDocContent=el('textarea',{id:'docContent',placeholder:'doc content', value:`{
+var labelJsonValid=el('label',{textContent:'[Is json valid]:'},el('label',{id:'isJson',textContent:'...'}));
+
+var textAreaDocContent=el('textarea',{onkeyup:checkDocJsonTyping, id:'docContent',placeholder:'doc content', value:`{
   "_id": "mydoc",
   "title": "Heroes"
 }`,
@@ -170,13 +207,15 @@ var divButtonMenus=el('div',[
   //,el('button',{onclick:getDbInfo ,textContent:'Update'})
   //,el('button',{onclick:getDbInfo ,textContent:'Find'})
   ,el('button',{onclick:clearResult ,textContent:'Clear Result'})
-  ,el('button',{onclick:fetechTest ,textContent:'Fetch Test'})
+  //,el('button',{onclick:fetechTest ,textContent:'Fetch Test'})
+  //,el('button',{onclick:fetechPostTest ,textContent:'Fetch Post'})
 ])
 //===============================================
 //
 var divDbPanel=el('div',[
   //inputDocId,
   labelDocId,
+  labelJsonValid,
   el('br'),
   textAreaDocContent,
   el('br'),
