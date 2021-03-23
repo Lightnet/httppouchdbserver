@@ -9,6 +9,9 @@
 */
 
 
+//INIT DATABASE?
+const db = require('./src/database');
+//console.log(db);
 
 // WEB SERVER
 //require('./src/httpserver');

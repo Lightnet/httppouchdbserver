@@ -22,12 +22,12 @@ PouchDB.plugin(require('pouchdb-find'));
 //console.log(path.resolve(__dirname, "/database/"))
 //console.log(path.join(__dirname, "../database/"))
 //console.log(path.resolve('./'));
-var currentDir = path.resolve('./');
-console.log(path.join(currentDir, "/database/"))
-var PrefixedPouchDB =PouchDB.defaults({
+//var currentDir = path.resolve('./');
+//console.log(path.join(currentDir, "/database/"))
+//var PrefixedPouchDB =PouchDB.defaults({
   //prefix: '/database/' //drive dir
-  prefix:path.join(currentDir, "/database/")
-});
+  //prefix:path.join(currentDir, "/database/")
+//});
 const config=require('../config');
 //console.log(config);
 
@@ -39,9 +39,9 @@ const tokenKey=  config.tokenKey || 'TOKEN';
 
 //const port = config.port || 3000;
 //init setup database
-const db = new PrefixedPouchDB('pouchdb');
-const nodeDb = new PrefixedPouchDB('node');
-
+//const db = new PrefixedPouchDB('pouchdb');
+//const nodeDb = new PrefixedPouchDB('node');
+const db = require('./database');
 //===============================================
 //
 //===============================================
@@ -367,8 +367,10 @@ async function dbrequestListener(req, res) {
   var cookies = cookie.parse(req.headers.cookie || '');
   //console.log('cookies:',cookies);
 
+  //console.log(`['x-access-token']`,req.headers['x-access-token'])
+
   // Get the visitor name set in the cookie
-  var token = cookies.token;
+  var token = cookies.token || req.headers['x-access-token'];
   console.log("TOKEN:",token);
 
   //test for cors
@@ -511,7 +513,7 @@ async function dbrequestListener(req, res) {
 
   console.log("GOIING PASS???");
   // pouchdb need authorization for user login
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, authorization, X-Requested-With, Content-Type, Accept, Options');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, authorization, X-Requested-With, x-access-token, Content-Type, Accept, Options');
   // pouchdb need Methods
   res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   // pouchdb need credentials

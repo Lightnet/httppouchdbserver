@@ -24,6 +24,21 @@ req.headers
   authorization
   x-xsrf-token
 
+access_token
+req.token
+fetch: (url, opts) => {
+  //opts.credentials = 'include';//error
+  //opts.origins = 'http://127.0.0.1:3000'//not tested
+  //opts.credentials = 'omit';//ok
+  //opts.headers.set('x-access-token',token); //token pass
+
+  let tokenformt = 'Bearer ' + token;
+  opts.headers.set('x-access-token',tokenformt); //token pass > 'Bearer ' + token;
+  //opts.headers.set('authorization',tokenformt); //token pass but has be "basic encode(user:pass)""
+
+  return PouchDB.fetch(url, opts);
+},
+
 ```
 ```javascript
 require('crypto').randomBytes(64).toString('hex')

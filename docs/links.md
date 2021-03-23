@@ -70,4 +70,13 @@
  * https://www.sitepoint.com/using-json-web-tokens-node-js/
  * https://gist.github.com/thebigredgeek/230368bd92aa19e3f6638b659edf5cef
  * https://developer.mindsphere.io/concepts/concept-authentication.html
+ * https://stackoverflow.com/questions/50284841/how-to-extract-token-string-from-bearer-token
+ * https://christiangiacomi.com/posts/express-barer-strategy/
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * 
