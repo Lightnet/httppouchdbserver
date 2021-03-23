@@ -1,38 +1,74 @@
   https://www.npmjs.com/package/bcrypt
+  https://jasonwatmore.com/post/2018/09/24/nodejs-basic-authentication-tutorial-with-example-api
+
+```javascript
+fetch('URL_GOES_HERE', { 
+   method: 'post', 
+   headers: new Headers({
+     'Authorization': 'Basic '+btoa('username:password'), 
+     'Content-Type': 'application/x-www-form-urlencoded'
+   }), 
+   body: 'A=1&B=2'
+ });
+```
 
 
+```javascript
+//pouchdb
+error.unauthorized
+```
 
+```javascript
+req.headers
+  x-access-token
+  authorization
+  x-xsrf-token
 
+```
+```javascript
+require('crypto').randomBytes(64).toString('hex')
+// '09f26e402586e2faa8da4c98a35f1b20d6b033c6097befa8be3486a829587fe2f90a832bd3ff9d42710a4da095a2ce285b009f0c3730cd9b8e1af3eb84df6611'
+```
+```javascript
 
+//ok i think '/database/mydocs/test?' > /database/mydocs/
+//var re = /^.*[\\\/]/;
+//let text=mypath.match(re)[0];
+//console.log(text);
 
+//var re = /[A-Za-z0-9_]*[A-Za-z0-9_]/; //first database
+//let text=mypath.match(re)[0];
+//console.log(text);
 
+//var re = /[A-Za-z0-9_]*[A-Za-z0-9_]\/[A-Za-z0-9_]*[A-Za-z0-9_]/; //
+//let text=mypath.match(re)[0];
+//console.log(text);
 
+//var re = /\.*([A-Za-z0-9_]*[A-Za-z0-9_])/; //first database
+//let text=mypath.match(re)[0];
+//console.log(text);
 
+//var re = /\/([a-zA-Z_0-9]*[a-zA-Z_0-9])+\/([a-zA-Z_0-9]*[a-zA-Z_0-9])/; //first/second database
+//let text=mypath.match(re)[2];
+//console.log(text);
 
+//var re = /([a-zA-Z_0-9]*[a-zA-Z_0-9]+)\/(.*)[\?]/;
+//let text=mypath.match(re)[0];
+//console.log(text);
 
+// \/([^.*]*\+)\/([^\n]*$)
+//    (?<=\/)    //ingore question mark
 
+//==========================================
+//var pathdb='/testdata/tes/t?sdf';
+//var rex = /([^\/][-a-z_A-Z0-9]*)\/([^\\\?]*)/;
+//console.log(pathdb.match(rex)[1]);//database
+//console.log(pathdb.match(rex)[2]);//file path
+//console.log(pathdb.match(rex));
 
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  ```javascript
+```javascript
 // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString
 //console.log(new Date().getTime());
@@ -52,10 +88,10 @@ let timenum = timeStamp();
 console.log(timeDate(1616436221506));
 console.log(timeDate(timenum));
 
-  ```
+```
   
   
-  ```javascript
+```javascript
   // Set CORS headers
   res.setHeader("Access-Control-Allow-Origin",  'http://127.0.0.1:3000, http://127.0.0.1:5984/pouchdb/');
   res.setHeader("Access-Control-Allow-Origin",  'http://127.0.0.1:3000');

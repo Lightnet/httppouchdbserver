@@ -1,3 +1,12 @@
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
+
+  Information:
+    
+*/
+
 // https://stackoverflow.com/questions/22453782/nodejs-http-and-https-over-same-port
 
 'use strict';

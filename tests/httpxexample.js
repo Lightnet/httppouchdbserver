@@ -1,3 +1,12 @@
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
+
+  Information:
+    
+*/
+
 'use strict';
 //let express = require('express');
 let fs = require('fs');

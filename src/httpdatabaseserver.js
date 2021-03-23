@@ -1,23 +1,11 @@
-// https://www.digitalocean.com/community/tutorials/how-to-create-a-web-server-in-node-js-with-the-http-module
-// https://stackoverflow.com/questions/4025635/how-can-i-change-the-last-component-of-a-url-path/4025655
-// https://stackoverflow.com/questions/6165381/how-to-get-the-last-part-of-a-string-in-javascript/6165387
-// https://stackoverflow.com/questions/8082239/get-the-first-part-of-a-url-path
-// https://gist.github.com/balupton/3696140
-// https://www.section.io/engineering-education/what-is-cors-policy/
-// https://stackoverflow.com/questions/54204080/cors-issue-with-restify
-// https://github.com/restify/node-restify/issues/284
-// https://www.npmjs.com/package/cors
-// https://stackoverflow.com/questions/42543514/fetch-post-issues-with-cors-not-getting-header
-// https://docs.oracle.com/cd/E65459_01/dev.1112/e65461/content/general_cors.html
-// https://stackoverflow.com/questions/10265798/determine-project-root-from-a-running-node-js-application
-// https://stackabuse.com/get-http-post-body-in-express-js/
-// https://itnext.io/how-to-handle-the-post-request-body-in-node-js-without-using-a-framework-cd2038b93190
-// 
-// 
-// 
-// 
-// 
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
 
+  Information:
+    
+*/
 
 // SET UP MODULES
 const http = require("http");
@@ -26,7 +14,7 @@ const { parse } = require('querystring');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
-const url = require('url');
+//const url = require('url');
 const fs = require('fs').promises;
 const PouchDB = require('pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
@@ -84,7 +72,7 @@ function initDB(){
     console.log(err);
   });
 }
-
+//===============================================
 async function loginDB(args){
   if(!args){
     return null;
@@ -98,6 +86,22 @@ async function loginDB(args){
       resolve(err);
     }
   });
+}
+//===============================================
+async function orignLoginDB(args){
+  if(!args){
+    return null;
+  }
+  return new Promise( async (resolve, reject) => {
+    try {
+      var response = await db.get(args.alias);
+      resolve(response);
+    } catch (err) {
+      //console.log(err);
+      resolve(err);
+    }
+  });
+
 }
 
 async function tokenLoginDB(args){
@@ -490,6 +494,7 @@ async function dbrequestListener(req, res) {
   }
 
   if(req.url=='/logout'){
+    console.log("LOGOUT")
     // Set a new cookie with the name
     res.setHeader('Set-Cookie', cookie.serialize('token', String(''), {
       httpOnly: true,
@@ -526,7 +531,16 @@ async function dbrequestListener(req, res) {
     //console.log(authorization.split(" "));
     //console.log(Buffer.from((authorization).split(" ")[1], 'base64').toString())
     let usercert =Buffer.from((authorization).split(" ")[1], 'base64').toString();
-    console.log(usercert.split(":"));
+    //console.log(usercert.split(":"));
+    let result = await orignLoginDB({
+      alias:usercert.split(":")[0],
+      passphrase:usercert.split(":")[1]
+    });
+    console.log('authorization result:', result);
+    //res.statusCode=401;
+    //return res.end(JSON.stringify({error:'unauthorized'}));
+    //return res.end(JSON.stringify({ok:true}));
+
     //let userandpass = new Buffer(req.headers.authorization.split(" ")[1], 'base64').toString();
     //console.log(userandpass);
   }

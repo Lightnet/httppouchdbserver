@@ -1,18 +1,11 @@
-// https://www.digitalocean.com/community/tutorials/how-to-create-a-web-server-in-node-js-with-the-http-module
-// https://stackoverflow.com/questions/4025635/how-can-i-change-the-last-component-of-a-url-path/4025655
-// https://stackoverflow.com/questions/6165381/how-to-get-the-last-part-of-a-string-in-javascript/6165387
-// https://stackoverflow.com/questions/8082239/get-the-first-part-of-a-url-path
-// https://gist.github.com/balupton/3696140
-// https://www.section.io/engineering-education/what-is-cors-policy/
-// https://stackoverflow.com/questions/54204080/cors-issue-with-restify
-// https://github.com/restify/node-restify/issues/284
-// https://www.npmjs.com/package/cors
-// https://stackoverflow.com/questions/42543514/fetch-post-issues-with-cors-not-getting-header
-// https://docs.oracle.com/cd/E65459_01/dev.1112/e65461/content/general_cors.html
-// 
-// 
-// 
-// 
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
+
+  Information:
+    
+*/
 
 // SET UP MODULES
 const http = require("http");

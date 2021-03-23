@@ -1,3 +1,12 @@
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
+
+  Information:
+    
+*/
+
 const http = require('http');
 
 http.createServer((request, response) => {

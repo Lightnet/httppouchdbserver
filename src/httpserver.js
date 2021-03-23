@@ -1,3 +1,12 @@
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
+
+  Information:
+    
+*/
+
 // SET UP MODULES
 const http = require("http");
 //const cookie = require('cookie');

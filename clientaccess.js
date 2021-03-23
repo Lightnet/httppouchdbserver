@@ -1,3 +1,12 @@
+/*
+  # httppouchdbserver
+  # LICENSE: MIT
+  # Created by: Ligntnet
+
+  Information:
+    
+*/
+
 console.log('PouchDB Access');
 
 const { el, mount, unmount } = redom;
