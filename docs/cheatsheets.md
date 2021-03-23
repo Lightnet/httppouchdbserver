@@ -1,6 +1,8 @@
   https://www.npmjs.com/package/bcrypt
   https://jasonwatmore.com/post/2018/09/24/nodejs-basic-authentication-tutorial-with-example-api
+  https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
 
+  
 ```javascript
 fetch('URL_GOES_HERE', { 
    method: 'post', 

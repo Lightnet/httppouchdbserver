@@ -275,7 +275,8 @@ body+=`
   <body>
 `;
 if(args.default){
-  body+=`<script src="/client.js"></script>`;
+  //body+=`<script src="/client.js"></script>`;
+  body+=`<script src="/clientpouchdb.js"></script>`;
 }else{
   body+=`<script src="/clientaccess.js"></script>`;
 }
@@ -293,6 +294,7 @@ function resourceNotfound(res){
 ;(async ()=>{
   const clientjs = await fs.readFile('./client.js', 'utf8');
   const clientaccessjs = await fs.readFile('./clientaccess.js', 'utf8');
+  const clientpouchdbjs = await fs.readFile('./clientpouchdb.js', 'utf8');
 
 async function dbrequestListener(req, res) {
   console.log('DATABASE SERVER CHECKING....');
@@ -311,6 +313,12 @@ async function dbrequestListener(req, res) {
     res.setHeader("Content-Type", "text/javascript");
     res.statusCode=200;
     res.end(clientjs);
+    return;
+  }
+  if(req.url=='/clientpouchdb.js'){
+    res.setHeader("Content-Type", "text/javascript");
+    res.statusCode=200;
+    res.end(clientpouchdbjs);
     return;
   }
   if(req.url=='/clientaccess.js'){

@@ -284,11 +284,12 @@ async function signUpDB(args){
       console.log(decoded);
     } catch(err) {
       // err
-      res.json({
+      res.clearCookie('token');
+      return res.json({
         error:"TOKEN INVALID"
       });
     }
-
+    console.log(decoded);
     token = jwt.sign({
       alias: decoded.alias
       , role: decoded.role
