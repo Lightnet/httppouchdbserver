@@ -364,7 +364,6 @@ async function dbrequestListener(req, res) {
       //httpOnly: true,
       //maxAge: 60 * 60 * 24 * 7 // 1 week
     //}));
- 
     // Redirect back after setting cookie
     //res.statusCode = 302;
     //res.setHeader('Location', req.headers.referer || '/');
@@ -374,9 +373,7 @@ async function dbrequestListener(req, res) {
   // Parse the cookies on the request
   var cookies = cookie.parse(req.headers.cookie || '');
   //console.log('cookies:',cookies);
-
   //console.log(`['x-access-token']`,req.headers['x-access-token'])
-
   // Get the visitor name set in the cookie
   var token = cookies.token || req.headers['x-access-token'];
   console.log("TOKEN:",token);
@@ -539,28 +536,22 @@ async function dbrequestListener(req, res) {
   if(authorization){//check if pouchdb send out auth login.
     //console.log('typeof authorization', typeof authorization);
     //console.log(authorization.split(" "));
+    // TODOLIST
+    // Need to check two types
     //console.log(Buffer.from((authorization).split(" ")[1], 'base64').toString())
-    let usercert =Buffer.from((authorization).split(" ")[1], 'base64').toString();
+    //let usercert =Buffer.from((authorization).split(" ")[1], 'base64').toString();
     //console.log(usercert.split(":"));
-    let result = await orignLoginDB({
-      alias:usercert.split(":")[0],
-      passphrase:usercert.split(":")[1]
-    });
-    console.log('authorization result:', result);
+    //let result = await orignLoginDB({
+      //alias:usercert.split(":")[0],
+      //passphrase:usercert.split(":")[1]
+    //});
+    //console.log('authorization result:', result);
     //res.statusCode=401;
     //return res.end(JSON.stringify({error:'unauthorized'}));
     //return res.end(JSON.stringify({ok:true}));
-
     //let userandpass = new Buffer(req.headers.authorization.split(" ")[1], 'base64').toString();
     //console.log(userandpass);
   }
-  // testing... for user login
-  //var database = cookies.database;
-  //if(database){
-    //console.log('FOUND DATABASE');
-  //}else{
-    //console.log('NULL DATABASE');
-  //}
   
   //const queryObject = new url.URL(req.url,true).pathname;
   //console.log(queryObject);
@@ -631,13 +622,20 @@ async function dbrequestListener(req, res) {
     //console.log('FOUND DATABASE');
     //TODOLIST
     //need to fixed and prevent delete access
-    res.statusCode=200;
-    let result = await destroyDb();
-    if(typeof result == 'string'){
-      res.end(result);
-    }else{
-      res.end(JSON.stringify(result));
-    }
+    //res.statusCode=200;
+    //try{
+    //let result = await destroyDb();
+    //if(typeof result == 'string'){
+      //res.end(result);
+    //}else{
+      //res.end(JSON.stringify(result));
+    //}
+    //}catch(error){
+      //res.statusCode=401;
+      //return res.end(JSON.stringify({error:'unauthorized'}));  
+    //}
+    res.statusCode=401;
+    res.end(JSON.stringify({error:'unauthorized'}));
     return;
   }
   

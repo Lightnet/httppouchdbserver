@@ -9,7 +9,7 @@
 
 console.log('Init PouchDB!');
 
-const { el, mount } = redom;
+const { el, mount,unmount } = redom;
 
 // test url access
 //var db = new PouchDB('http://127.0.0.1:5984/pouchdb');
@@ -21,11 +21,21 @@ function timeDate(num){
   return clock.toLocaleString("en-US");
 }
 ;(async()=>{
+//===============================================
+// START SANDBOX
+//===============================================
+
+//===============================================
+// HELPERS
+//===============================================
   function isEmptyString(s){
     return ((typeof s === 'string' || s instanceof String) && s !== '');
   }
-
+//===============================================
+// 
+//===============================================
   var db;
+  var alias="Guest";
   //Test user and password
   //let username='';
   //let password='';
@@ -89,6 +99,8 @@ function timeDate(num){
     console.log(data);
     console.log(timeDate(data.exp))
     console.log(timeDate(data.iat))
+    alias=data.alias;
+    document.getElementById('alias').textContent=alias;
   }
 
   function getToken(){
@@ -115,17 +127,100 @@ function timeDate(num){
     console.log(token);
   }
 
-  getToken();
+//===============================================
+// 
+//===============================================
+  const divFeeds=el(`div`,'Feeds');
+  const divCharacter=el(`div`,'divCharacter');
+  const divParty=el(`div`,'divParty');
+  const divInventory=el(`div`,'divInventory');
+  const divQuests=el(`div`,'divQuests');
+  const divBattle=el(`div`,'divBattle');
+  const divMap=el(`div`,'divMap');
+  const divSettings=el(`div`,'divSettings');
+  const divDev=el(`div`,'divDev');
+
+  const divContent=el(`div`);
   //===============================================
   var divDbPanel=el('div',[
     el('a',{href:'/logout',textContent:'Logout'}),
     el('span',{textContent:' - | - '}),
+    el('label',{textContent:'User:'}),
+    el('label',{id:'alias',textContent:'Guest'}),
+    el('span',{textContent:' - | - '}),
     //el('button',{onclick:getToken,textContent:'Get Token'}),
     //el('button',{onclick:getTokenLog,textContent:'Get Token ID'}),
     //el('button',{onclick:initDB,textContent:'Init DB'}),
-    el('button',{onclick:getDBInfo,textContent:'Get DB Info'})
-
+    el('button',{onclick:btnFeeds,textContent:'Feeds'}),
+    el('button',{onclick:btnCharacter,textContent:'Character'}),
+    el('button',{onclick:btnParty,textContent:'Party'}),
+    el('button',{onclick:btnQuests,textContent:'Inventory'}),
+    el('button',{onclick:btnInventory,textContent:'Quests'}),
+    el('button',{onclick:btnMap,textContent:'Map'}),
+    el('button',{onclick:btnBattle,textContent:'Battle'}),
+    el('button',{onclick:btnSettings,textContent:'Settings'}),
+    el('button',{onclick:btnDev,textContent:'Dev'}),
+    divContent,
   ]);
   mount(document.body, divDbPanel);
+  // INIT TOKEN KEY SET UP
+  getToken();
   //===============================================
+
+  function hideDivs(){
+    unmount(divContent,divFeeds);
+    unmount(divContent,divCharacter);
+    unmount(divContent,divParty);
+    unmount(divContent,divInventory);
+    unmount(divContent,divQuests);
+    unmount(divContent,divBattle);
+    unmount(divContent,divMap);
+    unmount(divContent,divSettings);
+    unmount(divContent,divDev);
+  }
+
+  function showDivPanel(_d){
+    hideDivs()
+    mount(divContent,_d);
+  }
+
+  function btnFeeds(){
+    console.log("btnFeeds");
+    showDivPanel(divFeeds);
+  }
+  function btnCharacter(){
+    console.log("btnCharacter");
+    showDivPanel(divCharacter);
+  }
+  function btnParty(){
+    console.log("btnParty");
+    showDivPanel(divParty);
+  }
+  function btnInventory(){
+    console.log("btnInventory");
+    showDivPanel(divInventory);
+  }
+  function btnQuests(){
+    console.log("btnQuests");
+    showDivPanel(divQuests);
+  }
+  function btnBattle(){
+    console.log("btnBattle");
+    showDivPanel(divBattle);
+  }
+  function btnMap(){
+    console.log("btnMap");
+    showDivPanel(divMap);
+  }
+  function btnSettings(){
+    console.log("btnSettings");
+    showDivPanel(divSettings);
+  }
+  function btnDev(){
+    console.log("btnDev");
+    showDivPanel(divDev);
+  }
+//===============================================
+// END SANDBOX
+//===============================================
 })();
